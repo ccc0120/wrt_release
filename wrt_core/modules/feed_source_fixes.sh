@@ -267,7 +267,13 @@ fix_easytier_mk() {
         sed -i 's/!@(mips||mipsel)/!TARGET_mips \&\& !TARGET_mipsel/g' "$mk_path"
     fi
 }
-
+fix_tailscale_conflict() {
+    local tailscale_mk="$BUILD_DIR/feeds/packages/net/tailscale/Makefile"
+    if [ -f "$tailscale_mk" ]; then
+       sed -i '/\/etc\/init\.d\/tailscale/d;/\/etc\/config\/tailscale/d;' "$tailscale_mk"
+       echo "已移除上游 tailscale 的 init/config 文件声明，避免与 luci-app-tailscale 冲突。"
+    fi
+}
 
 remove_tweaked_packages() {
     local target_mk="$BUILD_DIR/include/target.mk"
