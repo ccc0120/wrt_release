@@ -44,6 +44,7 @@ jobs:
   build:
     permissions: 
       contents: write
+      actions: write
     
     strategy:
       matrix:
