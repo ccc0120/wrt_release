@@ -228,6 +228,26 @@ install_custom_feed() {
         return 1
     fi
 
+        # 同步官方 js 版 luci-app-tailscale（解决 lua 版在 js LuCI 下的 ACL 兼容性问题）
+    local luci_tailscale_tmp=$(mktemp -d)
+    echo "正在从 openwrt/luci 同步 js 版 luci-app-tailscale..."
+    if git_retry clone --depth 1 --filter=blob:none --no-checkout -b "openwrt-24.10" "https://github.com/openwrt/luci.git" "$luci_tailscale_tmp"; then
+        pushd "$luci_tailscale_tmp" >/dev/null
+        git_retry sparse-checkout init --cone
+        git_retry sparse-checkout set applications/luci-app-tailscale
+        git_retry checkout --quiet
+        popd >/dev/null
+        rm -rf "$custom_feed_dir/luci-app-tailscale"
+        mv "$luci_tailscale_tmp/applications/luci-app-tailscale" "$custom_feed_dir/luci-app-tailscale"
+        rm -rf "$luci_tailscale_tmp"
+        echo "官方 js 版 luci-app-tailscale 同步完成"
+    else
+        echo "错误：同步官方 luci-app-tailscale 失败" >&2
+        rm -rf "$luci_tailscale_tmp"
+        rm -rf "$custom_feed_dir"
+        return 1
+    fi
+    
     register_local_feed_source "$custom_feed_dir" "$feeds_path"
 
     echo "正在更新 $custom_feed_name 本地 feed 索引..."
