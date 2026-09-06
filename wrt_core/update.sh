@@ -112,7 +112,7 @@ stage_pre_install_source_fixes() {
     check_default_settings
     install_opkg_distfeeds
     fix_easytier_mk
-    fix_tailscale_conflict
+    #fix_tailscale_conflict
     remove_attendedsysupgrade
     fix_kconfig_recursive_dependency
 }
